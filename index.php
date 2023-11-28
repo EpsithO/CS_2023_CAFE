@@ -77,6 +77,10 @@ switch ($typeConnexion) {
     case "salarieEntrepriseCliente" :
         switch ($case) {
 
+            case "choixmdp":
+                include "Controleur/Controleur_visiteur.php";
+                break;
+
             case "Gerer_CommandeClient":
                 include "Controleur/Controleur_Gerer_CommandeClient.php";
                 break;

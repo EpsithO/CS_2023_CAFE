@@ -39,6 +39,19 @@ class Modele_Utilisateur
         return $tableauReponse;
     }
 
+    static function ModifierModifMdpBDD($idUtilisateur, $status)
+    {
+        $connexionPDO = Singleton_ConnexionPDO::getInstance();
+        $requetePreparee = $connexionPDO->prepare('
+        UPDATE `utilisateur`    
+        SET `modifMdp`= :parammotDePasse
+        WHERE idUtilisateur = :paramidUtilisateur');
+        $requetePreparee->bindParam('parammotDePasse', $status);
+        $requetePreparee->bindParam('paramidUtilisateur', $idUtilisateur);
+        $reponse = $requetePreparee->execute(); //$reponse boolean sur l'état de la requête
+        return $reponse;
+    }
+
     /**
      * @param $connexionPDO
      * @param $idUtilisateur
@@ -165,13 +178,14 @@ WHERE idUtilisateur = :paramidUtilisateur');
         $connexionPDO = Singleton_ConnexionPDO::getInstance();
          $requetePreparee = $connexionPDO->prepare(
             'UPDATE `utilisateur` 
-SET motDePasse = :parammotDePasse
-WHERE idUtilisateur = :paramidUtilisateur');
+                    SET motDePasse = :parammotDePasse
+                    WHERE idUtilisateur = :paramidUtilisateur');
         $requetePreparee->bindParam('parammotDePasse', $motDePasse);
         $requetePreparee->bindParam('paramidUtilisateur', $idUtilisateur);
         $reponse = $requetePreparee->execute(); //$reponse boolean sur l'état de la requête
         return $reponse;
     }
+
 
     /**
      * @param $connexionPDO

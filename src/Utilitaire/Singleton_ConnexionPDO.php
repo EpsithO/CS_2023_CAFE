@@ -11,8 +11,8 @@ class Singleton_ConnexionPDO extends PDO
     private function __construct()
     {
         parent::__construct('mysql:host=127.0.0.1;dbname=CS_2023_CAFE;charset=UTF8',
-            "CS_2023_CAFE",
-            "secret",
+            "root",
+            "",
             array(
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
             )

@@ -8,6 +8,8 @@ use App\Vue\Vue_Structure_BasDePage;
 use App\Vue\Vue_Structure_Entete;
 use App\Vue\Vue_Utilisateur_Formulaire;
 use App\Vue\Vue_Utilisateur_Liste;
+use function App\Fonctions\genererMotDePasseAléatoire;
+use function App\Fonctions\SendMailWithpasswordWithPhpMailer;
 
 $Vue->setEntete(new Vue_Structure_Entete());
 
@@ -38,8 +40,13 @@ switch ($action) {
         break;
     case "réinitialiserMDPUtilisateur":
         //Réinitialiser MDP sur la fiche de l'entreprise
+
+        $mdp = genererMotDePasseAléatoire(10);
+        SendMailWithpasswordWithPhpMailer($_REQUEST["email"],$mdp);
+
+
         $Utilisateur = Modele_Utilisateur::Utilisateur_Select_ParId($_REQUEST["idUtilisateur"]);
-        Modele_Utilisateur::Utilisateur_Modifier_motDePasse($_REQUEST["idUtilisateur"], "secret"); //$Utilisateur["idUtilisateur"]
+        Modele_Utilisateur::Utilisateur_Modifier_motDePasse($_REQUEST["idUtilisateur"], $mdp); //$Utilisateur["idUtilisateur"]
 
         $listeUtilisateur = Modele_Utilisateur:: Utilisateur_Select_Cafe();
         $Vue->addToCorps(new Vue_Utilisateur_Liste($listeUtilisateur));
