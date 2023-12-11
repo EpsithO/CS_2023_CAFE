@@ -1,5 +1,6 @@
 <?php
 namespace App\Fonctions;
+    use App\Modele\Modele_jeton;
     use App\Modele\Modele_Utilisateur;
     use Exception;
     use PHPMailer\PHPMailer\PHPMailer;
@@ -109,14 +110,56 @@ function CalculComplexiteMDP($mdp) :int
                 $msg = 'Désolé, quelque chose a mal tourné. Veuillez réessayer plus tard.';
             } else {
                 $utilisateur = Modele_Utilisateur::Utilisateur_Select_ParLogin($_REQUEST["email"]);
-                $modifMDP = Modele_Utilisateur::Utilisateur_Modifier_motDePasse($utilisateur["idUtilisateur"],$mdp);
+                $modifMDP = Modele_Utilisateur::Utilisateur_Modifier_motDePasse($utilisateur["idUtilisateur"], $mdp);
 
                 $msg = 'Message envoyé ! Merci de nous avoir contactés.';
             }
         } else {
             $msg = 'Il doit manquer qqc !';
         }
+    }
 
+        function creerJeton():string{
+            $octetsAleatoires = openssl_random_pseudo_bytes (256) ;
+            $jeton=sodium_bin2base64($octetsAleatoires, SODIUM_BASE64_VARIANT_ORIGINAL);
+            return $jeton;
+
+        }
+        function sendMailToken(string $token):string
+        {
+            $utilisateurMail = $_REQUEST["email"];
+            $mail = new PHPMailer;
+            $mail->isSMTP();
+            $mail->Host = '127.0.0.1';
+            $mail->Port = 1025; //Port non crypté
+            $mail->SMTPAuth = false; //Pas d’authentification
+            $mail->SMTPAutoTLS = false; //Pas de certificat TLS
+            $mail->setFrom('test@labruleriecomtoise.fr', 'admin');
+            $mail->addAddress($utilisateurMail, 'client');
+            if ($mail->addReplyTo('test@labruleriecomtoise.fr', 'admin')) {
+                $mail->Subject = 'Réinitialisation mot de passe';
+                $mail->isHTML(true);
+                $mail->Body = "Bonjour, suite à votre demande de reinitialisation de mot de passe nous vous adressons ci-dessous un lien de reinitialisation :
+             <a href='http://localhost:8080/index.php?action=token&token=$token'>Reinitialiser votre mot de passe</a>";
+
+                if (!$mail->send()) {
+                    $msg = 'Désolé, quelque chose a mal tourné. Veuillez réessayer plus tard.';
+                } else {
+                    $user = Modele_Utilisateur::Utilisateur_Select_ParLogin($utilisateurMail);
+                    $activation = Modele_Utilisateur::Utilisateur_Modifier_MdpAactiver($user["idUtilisateur"], 1);
+                    $date = new \DateTime();
+                    $date = $date->modify("+ 3 days");
+                    $date = $date->format("Y-m-d H:i:s");
+                    Modele_jeton::jetonAjouter($token, 0, $user["idUtilisateur"], $date);
+                    $_SESSION["token"] = $token;
+                    $_SESSION["idUtilisateur"] = $user["idUtilisateur"];
+
+                    $msg = 'Message envoyé ! Merci de nous avoir contactés.';
+                }
+            } else {
+                $msg = "'il s'agirait de renseigner un bon email";
+            }
+            return $msg;
 
     }
 

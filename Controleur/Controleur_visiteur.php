@@ -13,7 +13,9 @@ use App\Vue\Vue_Mail_ReinitMdp;
 use App\Vue\Vue_Menu_Administration;
 use App\Vue\Vue_Structure_BasDePage;
 use App\Vue\Vue_Structure_Entete;
+
 use function App\Fonctions\genererMotDePasseAléatoire;
+use function App\Fonctions\sendMailToken;
 
 //Ce contrôleur gère le formulaire de connexion pour les visiteurs
 
@@ -55,6 +57,25 @@ switch ($action) {
         $Vue->addToCorps(new Vue_Mail_Confirme($msg));
 
         break;
+
+    case 'token':
+        $token=\App\Modele\Modele_jeton::jetonRecuperer($_SESSION['token']);
+
+        if (!empty($token)){
+            $Vue->addToCorps(new Vue_Mail_ChoisirNouveauMdp($_SESSION["token"],""));
+        }else{
+            echo "erreur de token";
+        }
+        break;
+
+
+    case "reinitmdpconfirm-token":
+        $tokenValue = \App\Fonctions\creerJeton();
+        $mail= sendMailToken($tokenValue);
+        $Vue->addToCorps(new Vue_Mail_Confirme());
+
+        break;
+
     case "reinitmdp":
 
 

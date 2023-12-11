@@ -186,6 +186,21 @@ WHERE idUtilisateur = :paramidUtilisateur');
         return $reponse;
     }
 
+    static function Utilisateur_Modifier_MdpAactiver($idUtilisateur, $activer)
+
+    {
+        $connexionPDO = Singleton_ConnexionPDO::getInstance();
+
+        $requetePreparee = $connexionPDO->prepare(
+            'UPDATE `utilisateur` 
+SET `MdpAmodifier`= :paramactiver
+WHERE idUtilisateur = :paramidUtilisateur');
+        $requetePreparee->bindParam('paramactiver', $activer);
+        $requetePreparee->bindParam('paramidUtilisateur', $idUtilisateur);
+        $reponse = $requetePreparee->execute(); //$reponse boolean sur l'état de la requête
+        return $reponse;
+    }
+
 
     /**
      * @param $connexionPDO
